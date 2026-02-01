@@ -6,26 +6,37 @@ const API_URL = 'https://api-vouch.sidshr.in/api/'
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     let accessToken = getAccessToken()
 
+    const headers: Record<string, string> = {
+        ...(options.headers as Record<string, string>),
+    }
+
+    if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`
+    }
+
     let res = await fetch(`${API_URL}${endpoint}`, {
         ...options,
-        headers: {
-            ...options.headers,
-            Authorization: `Bearer ${accessToken}`,
-        },
+        headers,
     })
 
-    // Access token expired
     if (res.status === 401) {
-        accessToken = await refreshAccessToken()
+        try {
+            accessToken = await refreshAccessToken()
 
-        res = await fetch(`${API_URL}${endpoint}`, {
-            ...options,
-            headers: {
-                ...options.headers,
+            const retryHeaders: Record<string, string> = {
+                ...(options.headers as Record<string, string>),
                 Authorization: `Bearer ${accessToken}`,
-            },
-        })
+            }
+
+            res = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers: retryHeaders,
+            })
+        } catch (e) {
+            return res
+        }
     }
 
     return res
 }
+

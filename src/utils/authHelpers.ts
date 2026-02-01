@@ -11,3 +11,4 @@ export const getLoggedInUserId = () => {
         return null
     }
 }
+

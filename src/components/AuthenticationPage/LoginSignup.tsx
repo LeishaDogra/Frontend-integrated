@@ -1,11 +1,21 @@
 import LoginSignupHeader from './LoginSignupHeader'
 import LoginSignupForm from './LoginSignupForm'
 import '../../App.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import backgroundLink from '../../assets/Background.jpg'
+import { getAccessToken } from '../../utils/tokens'
 
 const LoginSignup = () => {
     const [isSignup, setIsSignup] = useState(false)
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        const token = getAccessToken()
+        if (token) {
+            navigate('/eventspagecurrent', { replace: true })
+        }
+    }, [navigate])
 
     const switchMode = () => {
         setIsSignup((prev) => !prev)

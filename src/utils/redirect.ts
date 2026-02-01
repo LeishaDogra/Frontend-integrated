@@ -7,5 +7,6 @@ export const setNavigate = (nav: NavigateFunction) => {
 }
 
 export const redirectToLogin = () => {
-    navigate?.('/login', { replace: true })
+    // FIX: you don't have /login route, you have /loginsignup
+    navigate?.('/loginsignup', { replace: true })
 }

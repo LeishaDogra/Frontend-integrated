@@ -1,15 +1,22 @@
 import { useState } from 'react'
 import googleIcon from '../../assets/google.svg'
-import { Link } from 'react-router-dom'
 import type { ChangeEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { login } from '../../services/auth'
 
 interface Props {
     isSignup?: boolean
     switchMode: () => void
 }
+
 const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
+    const navigate = useNavigate()
+
     const [showPassword, setShowPassword] = useState(false)
     const [formData, setFormData] = useState({ email: '', password: '' })
+
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const switchPasswordVisibility = () => {
         setShowPassword(!showPassword)
@@ -17,6 +24,27 @@ const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
+    }
+
+    async function handleLogin() {
+        setError(null)
+
+        if (formData.email.trim() === '' || formData.password.trim() === '') {
+            setError('Please enter email and password')
+            return
+        }
+
+        setLoading(true)
+
+        try {
+            // NOTE: only login implemented right now (no signup endpoint shown)
+            await login(formData.email, formData.password)
+            navigate('/eventspagecurrent', { replace: true })
+        } catch (e) {
+            setError('Login failed. Please check your credentials.')
+        }
+
+        setLoading(false)
     }
 
     return (
@@ -118,10 +146,22 @@ const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
                             </div>
                         </div>
 
+                        {/* Error */}
+                        {error && (
+                            <p
+                                className="text-center mt-3"
+                                style={{ color: '#ff6b6b', fontSize: '14px' }}
+                            >
+                                {error}
+                            </p>
+                        )}
+
                         {/* Submit Button */}
                         <div className="d-flex justify-content-center mt-4">
                             <button
                                 type="button"
+                                onClick={handleLogin}
+                                disabled={loading}
                                 className="btn rounded-4 fw-medium align-items-center"
                                 style={{
                                     background:
@@ -133,15 +173,11 @@ const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
                                     height: '42px',
                                 }}
                             >
-                                <Link
-                                    to="/mainscreen"
-                                    style={{
-                                        textDecoration: 'none',
-                                        color: 'white',
-                                    }}
-                                >
-                                    {isSignup ? 'Sign Up' : 'Login'}
-                                </Link>
+                                {loading
+                                    ? 'Loading...'
+                                    : isSignup
+                                      ? 'Sign Up'
+                                      : 'Login'}
                             </button>
                         </div>
 
@@ -152,7 +188,7 @@ const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
                             or
                         </div>
 
-                        {/* Google Button */}
+                        {/* Google Button (UI only) */}
                         <div className="d-flex justify-content-center mt-3">
                             <a
                                 href="#"
@@ -197,6 +233,7 @@ const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
                                 {isSignup ? 'Login' : 'Create one'}
                             </span>
                         </div>
+
                         <div style={{ paddingTop: '100px' }}></div>
                     </form>
                 </div>
@@ -206,3 +243,4 @@ const LoginSignupForm = ({ isSignup, switchMode }: Props) => {
 }
 
 export default LoginSignupForm
+

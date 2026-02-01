@@ -6,6 +6,7 @@ import MainScreen from './components/MainScreen/MainScreen'
 import TermsAndConditions from './components/TermsAndConditions'
 import AddEvents from './components/AddEventsPage/AddEvents'
 import EventsPagePast from './components/EventsPage/EventsPagePast'
+import ProtectedRoute from './components/AuthenticationPage/ProtectedRoute'
 import { setNavigate } from './utils/redirect'
 import { useEffect } from 'react'
 
@@ -19,19 +20,61 @@ const App = () => {
     return (
         <Routes>
             <Route path="/" element={<LoginSignup />} />
-            <Route path="/addevents" element={<AddEvents />} />
-            <Route path="/eventspagecurrent" element={<EventsPageCurrent />} />
-            <Route path="/eventspagepast" element={<EventsPagePast />} />
-            <Route path="/aboutus" element={<AboutUs />} />
-            <Route path="/mainscreen" element={<MainScreen />} />
             <Route path="/loginsignup" element={<LoginSignup />} />
+
+            <Route
+                path="/addevents"
+                element={
+                    <ProtectedRoute>
+                        <AddEvents />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/eventspagecurrent"
+                element={
+                    <ProtectedRoute>
+                        <EventsPageCurrent />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/eventspagepast"
+                element={
+                    <ProtectedRoute>
+                        <EventsPagePast />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/mainscreen"
+                element={
+                    <ProtectedRoute>
+                        <MainScreen />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/events/current/:id"
+                element={
+                    <ProtectedRoute>
+                        <EventsPageCurrent />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route path="/aboutus" element={<AboutUs />} />
             <Route
                 path="/termsandconditions"
                 element={<TermsAndConditions />}
             />
-            <Route path="/events/current/:id" element={<EventsPageCurrent />} />
         </Routes>
     )
 }
 
 export default App
+
